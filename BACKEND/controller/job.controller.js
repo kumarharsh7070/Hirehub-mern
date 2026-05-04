@@ -2,7 +2,7 @@ import { Job } from "../models/job.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponses.js";
 import { asyncHandler } from "../utils/AsyncHandler.js";
-
+import {mongoose} from "mongoose"
 const createJob = asyncHandler(async (req, res) => {
   let { title, company, location, salary, description } = req.body;
 
@@ -36,4 +36,36 @@ const createJob = asyncHandler(async (req, res) => {
     .json(new ApiResponse(201, newJob, "Job created successfully"));
 });
 
-export { createJob };
+
+
+const deleteJob = asyncHandler(async (req, res) => {
+  const { jobId } = req.params;
+
+  // 🔹 Validate ObjectId
+  if (!mongoose.Types.ObjectId.isValid(jobId)) {
+    throw new ApiError(400, "Invalid job ID");
+  }
+
+  // 🔹 Find job
+  const job = await Job.findById(jobId);
+  if (!job) {
+    throw new ApiError(404, "Job not found");
+  }
+
+  // 🔹 Ownership check (only creator can delete)
+  if (!job.createdBy.equals(req.user._id)) {
+    throw new ApiError(403, "You are not allowed to delete this job");
+  }
+
+  // 🔹 Delete job
+  await job.deleteOne();
+
+  // 🔹 Response
+  return res
+    .status(200)
+    .json(new ApiResponse(200, {}, "Job deleted successfully"));
+});
+
+
+
+export { createJob , deleteJob};

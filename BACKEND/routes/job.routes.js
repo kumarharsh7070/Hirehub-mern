@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createJob } from "../controller/job.controller.js";
+import { createJob,deleteJob } from "../controller/job.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
 
@@ -11,6 +11,13 @@ router.post(
   verifyJWT,
   authorizeRoles("recruiter"),
   createJob
+);
+
+router.delete(
+  "/:jobId",
+  verifyJWT,
+  authorizeRoles("recruiter"),
+  deleteJob
 );
 
 export default router;
