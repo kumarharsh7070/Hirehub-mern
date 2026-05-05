@@ -66,6 +66,62 @@ const deleteJob = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "Job deleted successfully"));
 });
 
+const updateJob = asyncHandler(async (req, res) => {
+  const { jobId } = req.params;
 
+  const { title, company, location, salary, description } = req.body;
 
-export { createJob , deleteJob};
+  // 🔹 Validate ObjectId
+  if (!mongoose.Types.ObjectId.isValid(jobId)) {
+    throw new ApiError(400, "Invalid job ID");
+  }
+
+  // 🔹 Check at least one field
+  if (!title && !company && !location && !salary && !description) {
+    throw new ApiError(400, "At least one field is required");
+  }
+
+  // 🔹 Find job
+  const job = await Job.findById(jobId);
+  if (!job) {
+    throw new ApiError(404, "Job not found");
+  }
+
+  // 🔹 Ownership check
+  if (!job.createdBy.equals(req.user._id)) {
+    throw new ApiError(403, "You are not allowed to update this job");
+  }
+
+  // 🔹 Update fields
+  if (title) job.title = title.trim();
+  if (company) job.company = company.trim();
+  if (salary) job.salary = salary;
+  if (description) job.description = description.trim();
+
+  // 🔹 Nested location update
+  if (location) {
+    if (location.city) job.location.city = location.city;
+    if (location.country) job.location.country = location.country;
+    if (location.countryCode) job.location.countryCode = location.countryCode;
+  }
+
+  await job.save();
+
+  return res
+    .status(200)
+    .json(new ApiResponse(200, job, "Job updated successfully"));
+});
+
+const getAllJob = asyncHandler(async (req, res) => {
+  const jobs = await Job.find().sort({ createdAt: -1 });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      jobs,
+      jobs.length ? "Jobs fetched successfully" : "No jobs found"
+    )
+  );
+});
+
+export { createJob , deleteJob, updateJob,getAllJob};
