@@ -124,4 +124,29 @@ const getAllJob = asyncHandler(async (req, res) => {
   );
 });
 
-export { createJob , deleteJob, updateJob,getAllJob};
+
+const getSingleJob = asyncHandler(async (req, res) => {
+  const { jobId } = req.params;
+
+  // 🔹 Validate ObjectId
+  if (!mongoose.Types.ObjectId.isValid(jobId)) {
+    throw new ApiError(400, "Invalid job ID");
+  }
+
+  // 🔹 Find job
+  const job = await Job.findById(jobId);
+
+  // 🔹 Check job exists
+  if (!job) {
+    throw new ApiError(404, "Job not found");
+  }
+
+  // 🔹 Send response
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, job, "Job fetched successfully")
+    );
+});
+
+export { createJob , deleteJob, updateJob,getAllJob,getSingleJob};

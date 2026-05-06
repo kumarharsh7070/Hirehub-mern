@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createJob,deleteJob ,updateJob,getAllJob} from "../controller/job.controller.js";
+import { createJob, deleteJob ,updateJob, getAllJob, getSingleJob} from "../controller/job.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
 
@@ -28,5 +28,6 @@ router.patch(
 );
 
 router.get("/all", getAllJob);
+router.get("/:jobId", getSingleJob);
 
 export default router;
