@@ -11,12 +11,11 @@ app.use(cors());           // allow frontend requests
 // Routes-------------------------------
 import UserRoutes from "./routes/user.routes.js"
 import JobRoutes from "./routes/job.routes.js"
-
-
+import applicationRoutes from "./routes/application.routes.js";
 // API routes
 app.use("/api/v1/users", UserRoutes);
 app.use("/api/v1/jobs", JobRoutes);
-
+app.use("/api/v1/applications", applicationRoutes);
 
 // Test route
 app.get("/", (req, res) => {

@@ -21,6 +21,6 @@ const ApplicationSchema =  new mongoose.Schema({
         required:true
      }
 },{timestamps:true,
-    versionKey:true})
+    versionKey:false})
 
  export const Application = mongoose.model("Application", ApplicationSchema)
