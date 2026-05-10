@@ -120,4 +120,57 @@ const viewApplied = asyncHandler(async (req, res) => {
     )
   );
 });
-export {applyJob,viewApplied,getMyApplications}
+
+const updateApplicationStatus = asyncHandler(async (req, res) => {
+  const { applicationId } = req.params;
+  const { status } = req.body;
+
+  // 🔹 Validate ObjectId
+  if (!mongoose.Types.ObjectId.isValid(applicationId)) {
+    throw new ApiError(400, "Invalid application ID");
+  }
+
+  // 🔹 Validate status
+  const allowedStatus = ["accepted", "rejected"];
+
+  if (!allowedStatus.includes(status)) {
+    throw new ApiError(
+      400,
+      "Status must be accepted or rejected"
+    );
+  }
+
+  // 🔹 Find application
+  const application = await Application.findById(applicationId)
+    .populate("job");
+
+  // 🔹 Check application exists
+  if (!application) {
+    throw new ApiError(404, "Application not found");
+  }
+
+  // 🔹 Ownership check
+  if (
+    !application.job.createdBy.equals(req.user._id)
+  ) {
+    throw new ApiError(
+      403,
+      "You are not allowed to update this application"
+    );
+  }
+
+  // 🔹 Update status
+  application.status = status;
+
+  await application.save();
+
+  // 🔹 Response
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      application,
+      `Application ${status} successfully`
+    )
+  );
+});
+export {applyJob,viewApplied,getMyApplications,updateApplicationStatus}

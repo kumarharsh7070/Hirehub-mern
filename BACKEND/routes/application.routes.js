@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { applyJob,viewApplied,getMyApplications } from "../controller/application.controller.js";
+import { applyJob,viewApplied,getMyApplications ,updateApplicationStatus} from "../controller/application.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
 
@@ -24,5 +24,12 @@ router.get(
   verifyJWT,
   authorizeRoles("candidate"),
   getMyApplications
+);
+
+router.patch(
+  "/status/:applicationId",
+  verifyJWT,
+  authorizeRoles("recruiter"),
+  updateApplicationStatus
 );
 export default router;
