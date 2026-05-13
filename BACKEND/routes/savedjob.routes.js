@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { saveJob } from "../controller/savedJob.controller.js";
+import { saveJob , removeSavedJob,getSavedJobs} from "../controller/savedJob.controller.js";
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
 
@@ -12,4 +12,17 @@ router.post(
   saveJob
 );
 
+router.delete(
+  "/remove/:jobId",
+  verifyJWT,
+  authorizeRoles("candidate"),
+  removeSavedJob
+);
+
+router.get(
+  "/my-saved-jobs",
+  verifyJWT,
+  authorizeRoles("candidate"),
+  getSavedJobs
+);
 export default router;
