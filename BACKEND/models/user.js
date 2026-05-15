@@ -23,12 +23,6 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
     },
 
-    bio:{
-      type: String,
-      trim: true,
-      default: "",
-    },
-
     role: {
       type: String,
       enum: ["candidate", "recruiter"],
@@ -39,10 +33,69 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+
+    // 🔹 Profile fields
+    bio: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    skills: [
+      {
+        type: String,
+        trim: true,
+      },
+    ],
+
+    education: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    experience: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    resume: {
+      type: String,
+      default: "",
+    },
+
+    profilePhoto: {
+      type: String,
+      default: "",
+    },
+
+    github: {
+      type: String,
+      default: "",
+    },
+
+    linkedin: {
+      type: String,
+      default: "",
+    },
+
+    // 🔹 Recruiter/company fields
+    companyName: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    companyWebsite: {
+      type: String,
+      default: "",
+    },
   },
-  { timestamps: true,
-    versionKey: false
-   }
+  {
+    timestamps: true,
+    versionKey: false,
+  }
 );
 
 export const User = mongoose.model("User", userSchema);
