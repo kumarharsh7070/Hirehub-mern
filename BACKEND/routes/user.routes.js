@@ -1,11 +1,17 @@
 import { Router} from "express";
-import {registerUser,loginUser} from "../controller/user.controller.js"
+import {registerUser,loginUser,getProfile} from "../controller/user.controller.js"
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
 const router = Router();
 
 router.route("/register").post(registerUser)
 router.route("/login").post(loginUser)
+
+router.get(
+  "/profile",
+  verifyJWT,
+  getProfile
+);
 
 // router.get(
 //   "/test-protected",

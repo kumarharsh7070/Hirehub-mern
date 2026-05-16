@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponses.js";
 import { User } from "../models/user.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import mongoose from "mongoose";
 
 const registerUser = asyncHandler(async (req, res) => {
   let { name, email, password, role } = req.body;
@@ -96,4 +97,24 @@ const loginUser = asyncHandler(async (req, res) => {
   );
 });
 
-export { registerUser,loginUser };
+const getProfile = asyncHandler(async (req, res) => {
+
+  // 🔹 Find logged-in user
+  const user = await User.findById(req.user._id)
+    .select("-password");
+
+  // 🔹 Check user exists
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  // 🔹 Response
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      user,
+      "Profile fetched successfully"
+    )
+  );
+});
+export { registerUser,loginUser ,getProfile};
