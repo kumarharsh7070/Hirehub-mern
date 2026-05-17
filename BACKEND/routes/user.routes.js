@@ -1,5 +1,5 @@
 import { Router} from "express";
-import {registerUser,loginUser,getProfile} from "../controller/user.controller.js"
+import {registerUser,loginUser,getProfile,updateProfile} from "../controller/user.controller.js"
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
 const router = Router();
@@ -13,6 +13,11 @@ router.get(
   getProfile
 );
 
+router.patch(
+  "/profile",
+  verifyJWT,
+  updateProfile
+);
 // router.get(
 //   "/test-protected",
 //   verifyJWT,

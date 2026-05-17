@@ -117,4 +117,77 @@ const getProfile = asyncHandler(async (req, res) => {
     )
   );
 });
-export { registerUser,loginUser ,getProfile};
+
+const updateProfile = asyncHandler(async (req, res) => {
+
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
+
+  // 🔹 ADD THIS
+  const {
+    bio,
+    skills,
+    education,
+    experience,
+    linkedin,
+    github,
+    companyName,
+    companyWebsite,
+  } = req.body;
+
+  // 🔹 Validation
+  if (
+    !bio &&
+    !skills &&
+    !education &&
+    !experience &&
+    !linkedin &&
+    !github &&
+    !companyName &&
+    !companyWebsite
+  ) {
+    throw new ApiError(
+      400,
+      "At least one field is required"
+    );
+  }
+
+  // 🔹 Updates
+  if (bio) user.bio = bio.trim();
+
+  if (skills) user.skills = skills;
+
+  if (education)
+    user.education = education.trim();
+
+  if (experience)
+    user.experience = experience.trim();
+
+  if (linkedin)
+    user.linkedin = linkedin.trim();
+
+  if (github)
+    user.github = github.trim();
+
+  if (companyName)
+    user.companyName = companyName.trim();
+
+  if (companyWebsite)
+    user.companyWebsite =
+      companyWebsite.trim();
+
+  await user.save();
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      user,
+      "Profile updated successfully"
+    )
+  );
+});
+  
+export { registerUser,loginUser ,getProfile,updateProfile};
