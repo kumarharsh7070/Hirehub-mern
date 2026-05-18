@@ -149,4 +149,34 @@ const getSingleJob = asyncHandler(async (req, res) => {
     );
 });
 
-export { createJob , deleteJob, updateJob,getAllJob,getSingleJob};
+const filterJobs = asyncHandler(async(req,res)=>{
+  const {title, company, location} = req.params
+
+  const filter = {};
+
+  if(location){
+    filter[location.city] = filter;
+  }
+
+  if(title){
+    filter.title = title;
+  
+  }
+
+  if(company){
+    filter.company = company;
+  }
+
+const jobs = await Job.find(filter)
+
+return res.status(200).json(
+    new ApiResponse(
+      200,
+      jobs,
+      jobs.length
+        ? "Filtered jobs fetched successfully"
+        : "No jobs found"
+    )
+  );
+})
+export { createJob , deleteJob, updateJob, getAllJob, getSingleJob, filterJobs};
