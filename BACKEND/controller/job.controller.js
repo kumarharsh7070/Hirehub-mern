@@ -179,4 +179,47 @@ return res.status(200).json(
     )
   );
 })
-export { createJob , deleteJob, updateJob, getAllJob, getSingleJob, filterJobs};
+
+const searchJobs = asyncHandler(async (req, res) => {
+
+  // 🔹 Get keyword from frontend query
+  const { keyword } = req.query;
+
+  // 🔹 Search jobs in database
+  const jobs = await Job.find({
+    $or: [
+      {
+        title: {
+          $regex: keyword,
+          $options: "i",
+        },
+      },
+
+      {
+        company: {
+          $regex: keyword,
+          $options: "i",
+        },
+      },
+
+      {
+        description: {
+          $regex: keyword,
+          $options: "i",
+        },
+      },
+    ],
+  });
+
+  // 🔹 Send response
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      jobs,
+      jobs.length
+        ? "Jobs fetched successfully"
+        : "No jobs found"
+    )
+  );
+});
+export { createJob , deleteJob, updateJob, getAllJob, getSingleJob, filterJobs,searchJobs};
