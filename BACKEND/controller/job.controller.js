@@ -113,13 +113,37 @@ const updateJob = asyncHandler(async (req, res) => {
 });
 
 const getAllJob = asyncHandler(async (req, res) => {
-  const jobs = await Job.find().sort({ createdAt: -1 });
+
+  // Get page number from frontend
+  const page = Number(req.query.page) || 1;
+
+  // Number of jobs per page
+  const limit = 5;
+
+  // Skip formula
+  const skip = (page - 1) * limit;
+
+  // Fetch paginated jobs
+  const jobs = await Job.find()
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limit);
+
+  // Total jobs count
+  const totalJobs = await Job.countDocuments();
 
   return res.status(200).json(
     new ApiResponse(
       200,
-      jobs,
-      jobs.length ? "Jobs fetched successfully" : "No jobs found"
+      {
+        totalJobs,
+        currentPage: page,
+        totalPages: Math.ceil(totalJobs / limit),
+        jobs,
+      },
+      jobs.length
+        ? "Jobs fetched successfully"
+        : "No jobs found"
     )
   );
 });
