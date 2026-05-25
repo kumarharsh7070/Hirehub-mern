@@ -1,6 +1,7 @@
 import { asyncHandler } from "../utils/AsyncHandler.js";
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponses.js";
+import {uploadOnCloudinary} from "../utils/cloudinary.js"
 import { User } from "../models/user.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
@@ -189,5 +190,42 @@ const updateProfile = asyncHandler(async (req, res) => {
     )
   );
 });
+
+const uploadResume = asyncHandler(async (req, res) => {
+
+  // 🔹 Check file exists
+  if (!req.file) {
+    throw new ApiError(400, "Resume file is required");
+  }
+
+  // 🔹 Upload to cloudinary
+  const cloudinaryResponse =
+    await uploadOnCloudinary(req.file.path);
+
+  // 🔹 Check upload success
+  if (!cloudinaryResponse) {
+    throw new ApiError(
+      500,
+      "Failed to upload resume"
+    );
+  }
+
+  // 🔹 Find logged-in user
+  const user = await User.findById(req.user._id);
+
+  // 🔹 Save cloudinary URL
+  user.resume = cloudinaryResponse.secure_url;
+
+  await user.save();
+
+  // 🔹 Response
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      user,
+      "Resume uploaded successfully"
+    )
+  );
+});
   
-export { registerUser,loginUser ,getProfile,updateProfile};
+export { registerUser,loginUser ,getProfile,updateProfile,uploadResume};
