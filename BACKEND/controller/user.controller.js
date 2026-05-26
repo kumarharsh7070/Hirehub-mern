@@ -227,5 +227,55 @@ const uploadResume = asyncHandler(async (req, res) => {
     )
   );
 });
+
+const uploadProfile = asyncHandler(async (req, res) => {
+
+  // 🔹 Check image exists
+  if (!req.file) {
+    throw new ApiError(
+      400,
+      "Profile picture is required"
+    );
+  }
+
+  // 🔹 Upload image to cloudinary
+  const cloudinaryResponse =
+    await uploadOnCloudinary(req.file.path);
+
+  // 🔹 Check cloudinary upload success
+  if (!cloudinaryResponse) {
+    throw new ApiError(
+      500,
+      "Failed to upload profile picture"
+    );
+  }
+
+  // 🔹 Find logged-in user
+  const user = await User.findById(req.user._id);
+
+  // 🔹 Check user exists
+  if (!user) {
+    throw new ApiError(
+      404,
+      "User not found"
+    );
+  }
+
+  // 🔹 Save cloudinary image URL
+  user.profilePhoto =
+    cloudinaryResponse.secure_url;
+
+  // 🔹 Save updated user
+  await user.save();
+
+  // 🔹 Response
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      user,
+      "Profile picture uploaded successfully"
+    )
+  );
+});
   
-export { registerUser,loginUser ,getProfile,updateProfile,uploadResume};
+export { registerUser,loginUser ,getProfile,updateProfile,uploadResume,uploadProfile};
