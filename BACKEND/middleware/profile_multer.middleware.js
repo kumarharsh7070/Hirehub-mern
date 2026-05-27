@@ -1,35 +1,35 @@
 import multer from "multer";
 import path from "path";
 
-// 🔹 Storage configuration
+// storage
 const storage = multer.diskStorage({
-
   destination: function (req, file, cb) {
     cb(null, "public/uploads");
   },
 
   filename: function (req, file, cb) {
-
     const uniqueName =
-      Date.now() +
-      path.extname(file.originalname);
+      Date.now() + path.extname(file.originalname);
 
     cb(null, uniqueName);
   },
 });
 
-// 🔹 PDF filter
+// image filter
 const fileFilter = (req, file, cb) => {
 
-  if (file.mimetype === "application/pdf") {
+  if (
+    file.mimetype === "image/png" ||
+    file.mimetype === "image/jpeg" ||
+    file.mimetype === "image/jpg"
+  ) {
     cb(null, true);
   } else {
-    cb(new Error("Only PDF files allowed"), false);
+    cb(new Error("Only image files allowed"), false);
   }
 };
 
-// 🔹 Export upload middleware
-export const upload = multer({
+export const uploadAvatar = multer({
   storage,
   fileFilter,
 });

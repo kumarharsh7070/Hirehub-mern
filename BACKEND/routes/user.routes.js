@@ -1,8 +1,9 @@
 import { Router} from "express";
-import {registerUser,loginUser,getProfile,updateProfile,uploadResume} from "../controller/user.controller.js"
+import {registerUser,loginUser,getProfile,updateProfile,uploadResume,uploadProfile} from "../controller/user.controller.js"
 import { verifyJWT } from "../middleware/auth.middleware.js";
-import { upload } from "../middleware/multer.middleware.js";
+import { uploadResumes } from "../middleware/resume_multer.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
+import {uploadAvatar} from "../middleware/profile_multer.middleware.js"
 const router = Router();
 
 router.route("/register").post(registerUser)
@@ -20,11 +21,16 @@ router.patch(
   updateProfile
 );
 
-router.patch(
+router.post(
   "/upload-resume",
-  verifyJWT,
-  upload.single("resume"),
+  uploadResumes.single("resume"),
   uploadResume
+);
+
+router.post(
+  "/upload-avatar",
+  uploadAvatar.single("avatar"),
+  uploadProfile
 );
 // router.get(
 //   "/test-protected",
