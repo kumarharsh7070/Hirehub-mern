@@ -29,6 +29,7 @@ router.post(
 
 router.post(
   "/upload-avatar",
+  verifyJWT,
   uploadAvatar.single("avatar"),
   uploadProfile
 );
