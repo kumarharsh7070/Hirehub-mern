@@ -7,6 +7,20 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import mongoose from "mongoose";
 
+
+const generateAccessAndRefreshTokens = async (userId) => {
+  const user = await User.findById(userId);
+
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
+
+  user.refreshToken = refreshToken;
+
+  await user.save({ validateBeforeSave: false });
+
+  return { accessToken, refreshToken };
+};
+
 const registerUser = asyncHandler(async (req, res) => {
   let { name, email, password, role } = req.body;
 
@@ -60,7 +74,7 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   let { email, password } = req.body;
 
-  // 1. Validate
+  // 1. Validate input
   if (!email || !password) {
     throw new ApiError(400, "Email and password are required");
   }
@@ -69,21 +83,25 @@ const loginUser = asyncHandler(async (req, res) => {
 
   // 2. Find user
   const user = await User.findOne({ email });
-  if (!user) throw new ApiError(404, "User not found");
 
-  // 3. Compare password
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch) throw new ApiError(401, "Invalid credentials");
+  if (!user) {
+    throw new ApiError(404, "User not found");
+  }
 
-  // 4. 🔐 Create JWT token
-  const token = jwt.sign(
-    { id: user._id, role: user.role },   // payload
-    process.env.JWT_SECRET,              // secret
-    { expiresIn: process.env.JWT_EXPIRES_IN }
-  );
+  // 3. Verify password
+  const isMatch = await user.isPasswordCorrect(password);
 
-  // 5. Remove password
-  const userData = await User.findById(user._id).select("-password");
+  if (!isMatch) {
+    throw new ApiError(401, "Invalid credentials");
+  }
+
+  // 4. Generate tokens
+  const { accessToken, refreshToken } =
+    await generateAccessAndRefreshTokens(user._id);
+
+  // 5. Get user without sensitive fields
+  const userData = await User.findById(user._id)
+    .select("-password -refreshToken");
 
   // 6. Send response
   return res.status(200).json(
@@ -91,13 +109,13 @@ const loginUser = asyncHandler(async (req, res) => {
       200,
       {
         user: userData,
-        token
+        accessToken,
+        refreshToken,
       },
       "Login successful"
     )
   );
 });
-
 const getProfile = asyncHandler(async (req, res) => {
 
   // 🔹 Find logged-in user
@@ -191,6 +209,65 @@ const updateProfile = asyncHandler(async (req, res) => {
   );
 });
 
+const refreshAccessToken = asyncHandler(
+  async (req, res) => {
+
+    const incomingRefreshToken =
+      req.body.refreshToken;
+
+    if (!incomingRefreshToken) {
+      throw new ApiError(
+        401,
+        "Refresh token required"
+      );
+    }
+
+    const decoded = jwt.verify(
+      incomingRefreshToken,
+      process.env.REFRESH_TOKEN_SECRET
+    );
+
+    const user = await User.findById(
+      decoded._id
+    );
+
+    if (!user) {
+      throw new ApiError(
+        401,
+        "Invalid refresh token"
+      );
+    }
+
+    if (
+      incomingRefreshToken !==
+      user.refreshToken
+    ) {
+      throw new ApiError(
+        401,
+        "Refresh token expired"
+      );
+    }
+
+    const {
+      accessToken,
+      refreshToken
+    } =
+      await generateAccessAndRefreshTokens(
+        user._id
+      );
+
+    return res.status(200).json(
+      new ApiResponse(
+        200,
+        {
+          accessToken,
+          refreshToken,
+        },
+        "Access token refreshed"
+      )
+    );
+  }
+);
 const uploadResume = asyncHandler(async (req, res) => {
 
   // 🔹 Check file exists
@@ -278,4 +355,4 @@ const uploadProfile = asyncHandler(async (req, res) => {
   );
 });
   
-export { registerUser,loginUser ,getProfile,updateProfile,uploadResume,uploadProfile};
+export { registerUser,loginUser ,getProfile,updateProfile,uploadResume,uploadProfile,refreshAccessToken};

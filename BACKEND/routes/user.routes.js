@@ -1,5 +1,5 @@
 import { Router} from "express";
-import {registerUser,loginUser,getProfile,updateProfile,uploadResume,uploadProfile} from "../controller/user.controller.js"
+import {registerUser,loginUser,getProfile,updateProfile,uploadResume,uploadProfile,refreshAccessToken} from "../controller/user.controller.js"
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { uploadResumes } from "../middleware/resume_multer.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
@@ -23,6 +23,7 @@ router.patch(
 
 router.post(
   "/upload-resume",
+  verifyJWT,
   uploadResumes.single("resume"),
   uploadResume
 );
@@ -33,6 +34,17 @@ router.post(
   uploadAvatar.single("avatar"),
   uploadProfile
 );
+
+router.post(
+  "/refresh-token",
+  refreshAccessToken
+);
+
+// router.post(
+//   "/logout",
+//   verifyJWT,
+//   logoutUser
+// );
 // router.get(
 //   "/test-protected",
 //   verifyJWT,

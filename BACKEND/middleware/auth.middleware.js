@@ -4,30 +4,34 @@ import jwt from "jsonwebtoken";
 import { User } from "../models/user.js";
 
 const verifyJWT = asyncHandler(async (req, res, next) => {
-  // 🔹 Safe token extraction
+
+  // 🔹 Extract token from Authorization header
   const token = req.headers.authorization?.startsWith("Bearer ")
     ? req.headers.authorization.split(" ")[1]
     : null;
 
-  // 🔹 Check token exists
+  // 🔹 Check if token exists
   if (!token) {
     throw new ApiError(401, "Unauthorized request");
   }
 
-  // 🔹 Verify token
-  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  // 🔹 Verify Access Token
+  const decoded = jwt.verify(
+    token,
+    process.env.ACCESS_TOKEN_SECRET
+  );
 
-  // 🔹 Get user from DB
-  const user = await User.findById(decoded.id).select("-password");
+  // 🔹 Find user
+  const user = await User.findById(decoded._id)
+    .select("-password -refreshToken");
 
   if (!user) {
-    throw new ApiError(401, "Invalid token");
+    throw new ApiError(401, "Invalid access token");
   }
 
   // 🔹 Attach user to request
   req.user = user;
 
-  // 🔹 Move to next middleware/route
   next();
 });
 
