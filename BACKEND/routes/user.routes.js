@@ -1,5 +1,5 @@
 import { Router} from "express";
-import {registerUser,loginUser,getProfile,updateProfile,uploadResume,uploadProfile,refreshAccessToken} from "../controller/user.controller.js"
+import {registerUser,loginUser,getProfile,updateProfile,uploadResume,uploadProfile,refreshAccessToken,logoutUser} from "../controller/user.controller.js"
 import { verifyJWT } from "../middleware/auth.middleware.js";
 import { uploadResumes } from "../middleware/resume_multer.middleware.js";
 import { authorizeRoles } from "../middleware/role.middleware.js";
@@ -40,11 +40,11 @@ router.post(
   refreshAccessToken
 );
 
-// router.post(
-//   "/logout",
-//   verifyJWT,
-//   logoutUser
-// );
+router.post(
+  "/logout",
+  verifyJWT,
+  logoutUser
+);
 // router.get(
 //   "/test-protected",
 //   verifyJWT,

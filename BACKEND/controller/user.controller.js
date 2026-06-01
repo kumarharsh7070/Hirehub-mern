@@ -355,4 +355,22 @@ const uploadProfile = asyncHandler(async (req, res) => {
   );
 });
   
-export { registerUser,loginUser ,getProfile,updateProfile,uploadResume,uploadProfile,refreshAccessToken};
+const logoutUser = asyncHandler(async (req, res) => {
+  await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      $set: {
+        refreshToken: "",
+      },
+    }
+  );
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {},
+      "Logged out successfully"
+    )
+  );
+});
+export { registerUser,loginUser ,getProfile,updateProfile,uploadResume,uploadProfile,refreshAccessToken,logoutUser};
