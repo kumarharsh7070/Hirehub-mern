@@ -1,7 +1,7 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 
 function Login() {
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -23,6 +23,7 @@ function Login() {
 
         <form onSubmit={handleSubmit}>
 
+          {/* Email */}
           <div className="mb-4">
             <label className="block mb-2 font-medium">
               Email
@@ -37,6 +38,7 @@ function Login() {
             />
           </div>
 
+          {/* Password */}
           <div className="mb-6">
             <label className="block mb-2 font-medium">
               Password
@@ -51,12 +53,24 @@ function Login() {
             />
           </div>
 
+          {/* Login Button */}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
           >
             Login
           </button>
+
+          {/* Register Link */}
+          <p className="text-center mt-4">
+            Don't have an account?{" "}
+            <Link
+              to="/register"
+              className="text-blue-600 font-medium hover:underline"
+            >
+              Register
+            </Link>
+          </p>
 
         </form>
 
