@@ -1,20 +1,51 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../services/api";
+
 function Register() {
+  const navigate = useNavigate();
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("candidate");
 
-  const handleSubmit = (e) => {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log({
-      name,
-      email,
-      password,
-      role,
-    });
+    setError("");
+    setSuccess("");
+
+    if (!name || !email || !password) {
+      setError("All fields are required");
+      return;
+    }
+
+    try {
+      const response = await api.post("/users/register", {
+        name,
+        email,
+        password,
+        role,
+      });
+
+      console.log(response.data);
+
+      setSuccess("Registration successful! Redirecting to login...");
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 2000);
+
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        "Registration failed"
+      );
+    }
   };
 
   return (
@@ -25,6 +56,18 @@ function Register() {
         <h1 className="text-3xl font-bold text-center mb-6">
           Register
         </h1>
+
+        {error && (
+          <p className="text-red-600 text-center mb-4">
+            {error}
+          </p>
+        )}
+
+        {success && (
+          <p className="text-green-600 text-center mb-4">
+            {success}
+          </p>
+        )}
 
         <form onSubmit={handleSubmit}>
 
@@ -100,15 +143,17 @@ function Register() {
           >
             Register
           </button>
-<p className="text-center mt-4">
-  Already have an account?{" "}
-  <Link
-    to="/login"
-    className="text-blue-600 font-medium"
-  >
-    Login
-  </Link>
-</p>
+
+          <p className="text-center mt-4">
+            Already have an account?{" "}
+            <Link
+              to="/login"
+              className="text-blue-600 font-medium hover:underline"
+            >
+              Login
+            </Link>
+          </p>
+
         </form>
 
       </div>
