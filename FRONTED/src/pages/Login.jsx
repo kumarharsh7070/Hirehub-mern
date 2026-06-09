@@ -1,15 +1,60 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import api from "../services/api";
 
 function Login() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleSubmit = (e) => {
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Email:", email);
-    console.log("Password:", password);
+    setError("");
+    setSuccess("");
+
+    if (!email || !password) {
+      setError("Email and password are required");
+      return;
+    }
+
+    try {
+      const response = await api.post("/users/login", {
+        email,
+        password,
+      });
+
+      console.log(response.data);
+
+      const { accessToken, refreshToken } =
+        response.data.data;
+
+      localStorage.setItem(
+        "accessToken",
+        accessToken
+      );
+
+      localStorage.setItem(
+        "refreshToken",
+        refreshToken
+      );
+
+      setSuccess("Login successful!");
+
+      setTimeout(() => {
+        navigate("/profile");
+      }, 1500);
+
+    } catch (err) {
+      setError(
+        err.response?.data?.message ||
+        "Login failed"
+      );
+    }
   };
 
   return (
@@ -21,9 +66,20 @@ function Login() {
           Login
         </h1>
 
+        {error && (
+          <p className="text-red-600 text-center mb-4">
+            {error}
+          </p>
+        )}
+
+        {success && (
+          <p className="text-green-600 text-center mb-4">
+            {success}
+          </p>
+        )}
+
         <form onSubmit={handleSubmit}>
 
-          {/* Email */}
           <div className="mb-4">
             <label className="block mb-2 font-medium">
               Email
@@ -33,12 +89,13 @@ function Login() {
               type="email"
               placeholder="Enter your email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) =>
+                setEmail(e.target.value)
+              }
               className="w-full border border-gray-300 rounded-lg px-4 py-2"
             />
           </div>
 
-          {/* Password */}
           <div className="mb-6">
             <label className="block mb-2 font-medium">
               Password
@@ -48,12 +105,13 @@ function Login() {
               type="password"
               placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={(e) =>
+                setPassword(e.target.value)
+              }
               className="w-full border border-gray-300 rounded-lg px-4 py-2"
             />
           </div>
 
-          {/* Login Button */}
           <button
             type="submit"
             className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700"
@@ -61,7 +119,6 @@ function Login() {
             Login
           </button>
 
-          {/* Register Link */}
           <p className="text-center mt-4">
             Don't have an account?{" "}
             <Link

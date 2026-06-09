@@ -48,16 +48,14 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(409, "Email already taken");
   }
 
-  // 5. Hash password 🔐
-  const hashedPassword = await bcrypt.hash(password, 10);
 
   // 6. Create user
   const newUser = await User.create({
-    name,
-    email,
-    password: hashedPassword,
-    role,
-  });
+  name,
+  email,
+  password,
+  role,
+});
 
   // 7. Remove password from response
   const createdUser = await User.findById(newUser._id).select("-password");
@@ -87,7 +85,8 @@ const loginUser = asyncHandler(async (req, res) => {
   if (!user) {
     throw new ApiError(404, "User not found");
   }
-
+console.log("Entered Password:", password);
+console.log("Stored Password:", user.password);
   // 3. Verify password
   const isMatch = await user.isPasswordCorrect(password);
 

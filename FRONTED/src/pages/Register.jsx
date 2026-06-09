@@ -38,7 +38,7 @@ function Register() {
 
       setTimeout(() => {
         navigate("/login");
-      }, 2000);
+      }, 1500);
 
     } catch (err) {
       setError(
