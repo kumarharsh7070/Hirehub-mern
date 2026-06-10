@@ -7,6 +7,8 @@ function Profile() {
   const [experience, setExperience] = useState("");
   const [github, setGithub] = useState("");
   const [linkedin, setLinkedin] = useState("");
+  const [profilepicture, setprofilepicture] = useState("null");
+  const [resume,setresume] = useState("null");
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,6 +20,8 @@ function Profile() {
       experience,
       github,
       linkedin,
+      profilepicture,
+      resume,
     });
   };
 
@@ -106,7 +110,35 @@ function Profile() {
               className="w-full border border-gray-300 rounded-lg px-4 py-2"
             />
           </div>
+          <div className="mb-4">
+  <label className="block mb-2 font-medium">
+    Profile Photo
+  </label>
 
+  <input
+    type="file"
+    accept="image/*"
+    onChange={(e) =>
+      setProfilePhoto(e.target.files[0])
+    }
+    className="w-full border border-gray-300 rounded-lg px-4 py-2"
+  />
+</div>
+
+<div className="mb-6">
+  <label className="block mb-2 font-medium">
+    Resume
+  </label>
+
+  <input
+    type="file"
+    accept=".pdf,.doc,.docx"
+    onChange={(e) =>
+      setResume(e.target.files[0])
+    }
+    className="w-full border border-gray-300 rounded-lg px-4 py-2"
+  />
+</div>
           {/* Linkedin */}
           <div className="mb-6">
             <label className="block mb-2 font-medium">
