@@ -1,4 +1,6 @@
 import { useState } from "react";
+import api from "../services/api";
+
 
 function Profile() {
   const [bio, setBio] = useState("");
@@ -7,10 +9,10 @@ function Profile() {
   const [experience, setExperience] = useState("");
   const [github, setGithub] = useState("");
   const [linkedin, setLinkedin] = useState("");
-  const [profilepicture, setprofilepicture] = useState("null");
-  const [resume,setresume] = useState("null");
+  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [resume, setResume] = useState(null);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     console.log({
@@ -20,7 +22,7 @@ function Profile() {
       experience,
       github,
       linkedin,
-      profilepicture,
+      profilePhoto,
       resume,
     });
   };
@@ -109,37 +111,7 @@ function Profile() {
               onChange={(e) => setGithub(e.target.value)}
               className="w-full border border-gray-300 rounded-lg px-4 py-2"
             />
-          </div>
-          <div className="mb-4">
-  <label className="block mb-2 font-medium">
-    Profile Photo
-  </label>
-
-  <input
-    type="file"
-    accept="image/*"
-    onChange={(e) =>
-      setProfilePhoto(e.target.files[0])
-    }
-    className="w-full border border-gray-300 rounded-lg px-4 py-2"
-  />
-</div>
-
-<div className="mb-6">
-  <label className="block mb-2 font-medium">
-    Resume
-  </label>
-
-  <input
-    type="file"
-    accept=".pdf,.doc,.docx"
-    onChange={(e) =>
-      setResume(e.target.files[0])
-    }
-    className="w-full border border-gray-300 rounded-lg px-4 py-2"
-  />
-</div>
-          {/* Linkedin */}
+            {/* Linkedin */}
           <div className="mb-6">
             <label className="block mb-2 font-medium">
               LinkedIn
@@ -153,6 +125,44 @@ function Profile() {
               className="w-full border border-gray-300 rounded-lg px-4 py-2"
             />
           </div>
+          </div>
+          <div className="mb-4">
+            <label className="block mb-2 font-medium">
+              Profile Photo
+            </label>
+
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setProfilePhoto(e.target.files[0])}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            />
+
+            {profilePhoto && (
+              <p className="text-sm text-gray-600 mt-2">
+                Selected: {profilePhoto.name}
+              </p>
+            )}
+          </div>
+
+          <div className="mb-6">
+            <label className="block mb-2 font-medium">
+              Resume
+            </label>
+
+            <input
+              type="file"
+              accept=".pdf,.doc,.docx"
+              onChange={(e) => setResume(e.target.files[0])}
+              className="w-full border border-gray-300 rounded-lg px-4 py-2"
+            />
+            {resume && (
+              <p className="text-sm text-gray-600 mt-2">
+                Selected: {resume.name}
+              </p>
+            )}
+          </div>
+          
 
           <button
             type="submit"
