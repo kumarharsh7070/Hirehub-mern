@@ -15,16 +15,33 @@ function Profile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log({
+    try {
+  const response = await api.patch(
+    "/users/profile",
+    {
       bio,
-      skills,
+      skills: skills
+        .split(",")
+        .map((skill) => skill.trim()),
       education,
       experience,
       github,
       linkedin,
-      profilePhoto,
-      resume,
-    });
+    }
+  );
+
+  console.log(response.data);
+
+  alert("Profile updated successfully");
+
+} catch (error) {
+  console.log(error);
+
+  alert(
+    error.response?.data?.message ||
+    "Profile update failed"
+  );
+}
   };
 
   return (
