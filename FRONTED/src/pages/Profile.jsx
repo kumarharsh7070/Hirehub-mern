@@ -13,12 +13,11 @@ function Profile() {
   const [resume, setResume] = useState(null);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    try {
-  const response = await api.patch(
-    "/users/profile",
-    {
+  try {
+    // Update profile
+    await api.patch("/users/profile", {
       bio,
       skills: skills
         .split(",")
@@ -27,22 +26,37 @@ function Profile() {
       experience,
       github,
       linkedin,
+    });
+
+    // Upload profile photo
+    if (profilePhoto) {
+      const formData = new FormData();
+
+      formData.append(
+        "avatar",
+        profilePhoto
+      );
+
+      const response = await api.post(
+        "/users/upload-avatar",
+        formData
+      );
+
+      console.log(response.data);
     }
-  );
 
-  console.log(response.data);
+    alert("Profile updated successfully!");
 
-  alert("Profile updated successfully");
+  } catch (error) {
+    console.log(error);
 
-} catch (error) {
-  console.log(error);
+    alert(
+      error.response?.data?.message ||
+      "Something went wrong"
+    );
+  }
+};
 
-  alert(
-    error.response?.data?.message ||
-    "Profile update failed"
-  );
-}
-  };
 
   return (
     <div className="min-h-screen bg-gray-100 py-10">

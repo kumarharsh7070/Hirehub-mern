@@ -199,13 +199,17 @@ const updateProfile = asyncHandler(async (req, res) => {
 
   await user.save();
 
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      user,
-      "Profile updated successfully"
-    )
-  );
+  const updatedUser = await User.findById(
+  user._id
+).select("-password -refreshToken");
+
+return res.status(200).json(
+  new ApiResponse(
+    200,
+    updatedUser,
+    "Profile updated successfully"
+  )
+);
 });
 
 const refreshAccessToken = asyncHandler(
