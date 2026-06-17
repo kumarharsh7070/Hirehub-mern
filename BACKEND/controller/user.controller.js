@@ -317,7 +317,8 @@ const uploadProfile = asyncHandler(async (req, res) => {
       "Profile picture is required"
     );
   }
-
+  console.log("FILE:", req.file);
+console.log("PATH:", req.file?.path);
   // 🔹 Upload image to cloudinary
   const cloudinaryResponse =
     await uploadOnCloudinary(req.file.path);
