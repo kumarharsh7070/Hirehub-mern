@@ -55,6 +55,25 @@ function Profile() {
       "Something went wrong"
     );
   }
+
+  if (resume) {
+
+  const formData =
+    new FormData();
+
+  formData.append(
+    "resume",
+    resume
+  );
+
+  const response =
+    await api.post(
+      "/users/upload-resume",
+      formData
+    );
+
+  console.log(response.data);
+}
 };
 
 
