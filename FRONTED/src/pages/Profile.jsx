@@ -44,19 +44,7 @@ function Profile() {
 
       console.log(response.data);
     }
-
-    alert("Profile updated successfully!");
-
-  } catch (error) {
-    console.log(error);
-
-    alert(
-      error.response?.data?.message ||
-      "Something went wrong"
-    );
-  }
-
-  if (resume) {
+   if (resume) {
 
   const formData =
     new FormData();
@@ -74,6 +62,18 @@ function Profile() {
 
   console.log(response.data);
 }
+    alert("Profile, avatar and resume uploaded successfully!");
+
+  } catch (error) {
+    console.log(error);
+
+    alert(
+      error.response?.data?.message ||
+      "Something went wrong"
+    );
+  }
+
+  
 };
 
 

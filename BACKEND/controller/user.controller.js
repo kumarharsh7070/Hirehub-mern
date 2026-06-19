@@ -277,7 +277,8 @@ const uploadResume = asyncHandler(async (req, res) => {
   if (!req.file) {
     throw new ApiError(400, "Resume file is required");
   }
-
+ console.log("FILE:", req.file);
+console.log("PATH:", req.file?.path)
   // 🔹 Upload to cloudinary
   const cloudinaryResponse =
     await uploadOnCloudinary(req.file.path);
